@@ -35,9 +35,8 @@ final class TrackersViewController: UIViewController {
 
     // MARK: - Data
 
-    var categories: [TrackerCategory] = []
-
-    var completedTrackers: [TrackerRecord] = []
+    private var categories: [TrackerCategory] = []
+    private var completedTrackers: [TrackerRecord] = []
 
     private var visibleCategories: [TrackerCategory] = [] {
         didSet {
@@ -58,7 +57,7 @@ final class TrackersViewController: UIViewController {
         let container = UIView()
         container.translatesAutoresizingMaskIntoConstraints = false
 
-        let imageView = UIImageView(image: UIImage(named: "placeholder"))
+        let imageView = UIImageView(image: UIImage(named: "PlaceHolder"))
         imageView.translatesAutoresizingMaskIntoConstraints = false
         imageView.contentMode = .scaleAspectFit
 
@@ -80,7 +79,6 @@ final class TrackersViewController: UIViewController {
             titleLabel.topAnchor.constraint(equalTo: imageView.bottomAnchor, constant: 16),
             titleLabel.leadingAnchor.constraint(equalTo: container.leadingAnchor),
             titleLabel.trailingAnchor.constraint(equalTo: container.trailingAnchor),
-
         ])
 
         return container
@@ -167,20 +165,14 @@ final class TrackersViewController: UIViewController {
         let day = calendar.startOfDay(for: date)
         let today = calendar.startOfDay(for: Date())
 
-       
-        guard day <= today else {
-            print("Нельзя отмечать трекер для будущей даты")
-            return
-        }
+        guard day <= today else { return }
 
         if let index = completedTrackers.firstIndex(where: { record in
             record.trackerId == tracker.id &&
             calendar.isDate(record.date, inSameDayAs: day)
         }) {
-        
             completedTrackers.remove(at: index)
         } else {
-
             let record = TrackerRecord(trackerId: tracker.id, date: day)
             completedTrackers.append(record)
         }
@@ -199,34 +191,35 @@ final class TrackersViewController: UIViewController {
 
     // MARK: - Actions
 
-    @objc
-    private func addTrackerTapped() {
-        let newHabitVC = NewHabitViewController()
-        
-        newHabitVC.onCreateTracker = { [weak self] tracker in
-            guard let self = self else { return }
-            
+    @objc private func addTrackerTapped() {
+        let trackerStore = TrackerStore(context: CoreDataStack.shared.context)
+        let newHabitVC = NewHabitViewController(trackerStore: trackerStore)
+
+        newHabitVC.onCreateTracker = { [weak self] (tracker: Tracker) in
+            guard let self else { return }
+
             let categoryTitle = "Привычки"
-            
+
             if let index = self.categories.firstIndex(where: { $0.title == categoryTitle }) {
-                var category = self.categories[index]
-                let updated = TrackerCategory(title: category.title, trackers: category.trackers + [tracker])
-                self.categories[index] = updated
+                let category = self.categories[index]
+                self.categories[index] = TrackerCategory(
+                    title: category.title,
+                    trackers: category.trackers + [tracker]
+                )
             } else {
-                let newCategory = TrackerCategory(title: categoryTitle, trackers: [tracker])
-                self.categories.append(newCategory)
+                self.categories.append(
+                    TrackerCategory(title: categoryTitle, trackers: [tracker])
+                )
             }
-            
+
             self.applyFiltersForSelectedDate()
         }
-        
+
         let nav = UINavigationController(rootViewController: newHabitVC)
         present(nav, animated: true)
     }
 
-
-    @objc
-    private func datePickerValueChanged(_ sender: UIDatePicker) {
+    @objc private func datePickerValueChanged(_ sender: UIDatePicker) {
         selectedDate = calendar.startOfDay(for: sender.date)
         applyFiltersForSelectedDate()
     }
@@ -237,17 +230,15 @@ final class TrackersViewController: UIViewController {
 extension TrackersViewController: UICollectionViewDataSource {
 
     func numberOfSections(in collectionView: UICollectionView) -> Int {
-        return visibleCategories.count
+        visibleCategories.count
     }
 
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return visibleCategories[section].trackers.count
+        visibleCategories[section].trackers.count
     }
 
-    func collectionView(
-        _ collectionView: UICollectionView,
-        cellForItemAt indexPath: IndexPath
-    ) -> UICollectionViewCell {
+    func collectionView(_ collectionView: UICollectionView,
+                        cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(
             withReuseIdentifier: TrackerCell.reuseIdentifier,
             for: indexPath
@@ -261,11 +252,9 @@ extension TrackersViewController: UICollectionViewDataSource {
         let isCompleted = isCompletedOnSelectedDate(tracker)
         let count = completedCount(for: tracker)
 
-        cell.configure(
-            with: tracker,
-            isCompletedOnSelectedDate: isCompleted,
-            completedCount: count
-        )
+        cell.configure(with: tracker,
+                       isCompletedOnSelectedDate: isCompleted,
+                       completedCount: count)
         cell.delegate = self
 
         return cell
@@ -276,11 +265,9 @@ extension TrackersViewController: UICollectionViewDataSource {
 
 extension TrackersViewController: UICollectionViewDelegateFlowLayout {
 
-    func collectionView(
-        _ collectionView: UICollectionView,
-        layout collectionViewLayout: UICollectionViewLayout,
-        sizeForItemAt indexPath: IndexPath
-    ) -> CGSize {
+    func collectionView(_ collectionView: UICollectionView,
+                        layout collectionViewLayout: UICollectionViewLayout,
+                        sizeForItemAt indexPath: IndexPath) -> CGSize {
         let padding: CGFloat = 16 * 2 + 9
         let availableWidth = collectionView.bounds.width - padding
         let width = availableWidth / 2

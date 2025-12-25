@@ -98,3 +98,4 @@ final class TrackerCell: UICollectionViewCell {
         toggleButton.setImage(image, for: .normal)
     }
 }
+
