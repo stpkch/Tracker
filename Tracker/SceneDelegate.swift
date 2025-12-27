@@ -20,14 +20,15 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let windowScene = scene as? UIWindowScene else { return }
 
         let window = UIWindow(windowScene: windowScene)
-        window.rootViewController = RootTabBarController()
+
+        window.rootViewController = RootTabBarController(
+            trackerStore: trackerStore,
+            categoryStore: categoryStore,
+            recordStore: recordStore
+        )
+
         self.window = window
         window.makeKeyAndVisible()
-
-        // stores пока не используем — позже прокинем в контроллеры через init
-        _ = trackerStore
-        _ = categoryStore
-        _ = recordStore
     }
 
     func sceneDidEnterBackground(_ scene: UIScene) {
