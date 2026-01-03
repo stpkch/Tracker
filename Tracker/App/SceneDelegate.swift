@@ -4,13 +4,14 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     var window: UIWindow?
 
-    // Core Data
     private lazy var context = CoreDataStack.shared.context
-
-    // Stores
     private lazy var trackerStore = TrackerStore(context: context)
     private lazy var categoryStore = TrackerCategoryStore(context: context)
     private lazy var recordStore = TrackerRecordStore(context: context)
+
+    private enum Keys {
+        static let didShowOnboarding = "didShowOnboarding"
+    }
 
     func scene(
         _ scene: UIScene,
@@ -21,11 +22,27 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
         let window = UIWindow(windowScene: windowScene)
 
-        window.rootViewController = RootTabBarController(
+        let root = RootTabBarController(
             trackerStore: trackerStore,
             categoryStore: categoryStore,
             recordStore: recordStore
         )
+
+        if UserDefaults.standard.bool(forKey: Keys.didShowOnboarding) {
+            window.rootViewController = root
+        } else {
+            let onboarding = OnboardingPageViewController(
+                transitionStyle: .scroll,
+                navigationOrientation: .horizontal
+            )
+
+            onboarding.onFinish = {
+                UserDefaults.standard.set(true, forKey: Keys.didShowOnboarding)
+                window.rootViewController = root
+            }
+
+            window.rootViewController = onboarding
+        }
 
         self.window = window
         window.makeKeyAndVisible()
