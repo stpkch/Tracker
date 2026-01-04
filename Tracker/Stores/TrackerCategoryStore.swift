@@ -36,6 +36,25 @@ final class TrackerCategoryStore: NSObject {
     func categories() -> [TrackerCategoryCoreData] {
         fetchedResultsController.fetchedObjects ?? []
     }
+    
+    // MARK: - Write
+
+    func addCategory(title: String) throws {
+        let trimmed = title.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return }
+
+        let category = TrackerCategoryCoreData(context: context)
+
+        category.id = UUID()
+
+        category.title = trimmed
+        try context.save()
+    }
+
+    func deleteCategory(_ category: TrackerCategoryCoreData) throws {
+        context.delete(category)
+        try context.save()
+    }
 }
 
 extension TrackerCategoryStore: NSFetchedResultsControllerDelegate {

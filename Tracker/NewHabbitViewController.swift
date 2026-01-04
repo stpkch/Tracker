@@ -6,6 +6,8 @@ final class NewHabitViewController: UIViewController {
 
     private let trackerStore: TrackerStore
     private var selectedSchedule: Set<Weekday> = []
+    private var selectedCategoryTitle: String?
+
 
     // MARK: UI (Scroll container)
 
@@ -331,22 +333,38 @@ final class NewHabitViewController: UIViewController {
         let vc = ScheduleViewController()
         vc.selectedDays = selectedSchedule
         vc.onDone = { [weak self] days in
-            self?.selectedSchedule = days
+            guard let self else { return }
+            self.selectedSchedule = days
+            self.scheduleCell.setValue(days.isEmpty ? nil : "Выбрано дней: \(days.count)")
         }
         navigationController?.pushViewController(vc, animated: true)
     }
 
     @objc private func categoryTapped() {
+        let store = TrackerCategoryStore(context: CoreDataStack.shared.context)
+        let vm = CategoriesViewModel(store: store, selectedTitle: selectedCategoryTitle)
+        let vc = CategoriesViewController(viewModel: vm)
 
+        vc.onPickCategory = { [weak self] title in
+            guard let self else { return }
+            self.selectedCategoryTitle = title
+            self.categoryCell.setValue(title)
+            self.updateCreateButtonState()
+        }
+
+        navigationController?.pushViewController(vc, animated: true)
     }
 
-    // MARK: UI helpers
+
+// MARK: - UI helpers
 
     private func updateCreateButtonState() {
         let title = (nameTextField.text ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
         let isEnabled = !title.isEmpty
         && selectedEmojiIndexPath != nil
         && selectedColorIndexPath != nil
+        && (selectedCategoryTitle?.isEmpty == false)
+
 
         createButton.isEnabled = isEnabled
         createButton.backgroundColor = isEnabled ? .black : .systemGray
