@@ -55,6 +55,7 @@ final class CategoriesViewController: UIViewController {
         tableView.dataSource = self
         tableView.delegate = self
         tableView.tableFooterView = UIView()
+        tableView.register(CategoryCell.self, forCellReuseIdentifier: CategoryCell.reuseId)
     }
 
     private func layoutUI() {
@@ -117,26 +118,24 @@ final class CategoriesViewController: UIViewController {
     }
 }
 
-// MARK: - UITableViewDataSource, UITableViewDelegate
-
 extension CategoriesViewController: UITableViewDataSource, UITableViewDelegate {
 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         viewModel.numberOfRows()
     }
 
-    func tableView(
-        _ tableView: UITableView,
-        cellForRowAt indexPath: IndexPath
-    ) -> UITableViewCell {
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        guard let cell = tableView.dequeueReusableCell(
+            withIdentifier: CategoryCell.reuseId,
+            for: indexPath
+        ) as? CategoryCell else {
+            return UITableViewCell()
+        }
 
-        let id = "CategoryCell"
-        let cell = tableView.dequeueReusableCell(withIdentifier: id)
-            ?? UITableViewCell(style: .default, reuseIdentifier: id)
-
-        cell.textLabel?.text = viewModel.title(at: indexPath.row)
-        cell.accessoryType = viewModel.isSelected(at: indexPath.row) ? .checkmark : .none
-        cell.selectionStyle = .default
+        cell.configure(
+            title: viewModel.title(at: indexPath.row),
+            isSelected: viewModel.isSelected(at: indexPath.row)
+        )
 
         return cell
     }
