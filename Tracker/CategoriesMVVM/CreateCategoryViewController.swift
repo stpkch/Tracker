@@ -40,16 +40,25 @@ final class CreateCategoryViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        configureUI()
+        configureLayout()
+        configureActions()
+        bindViewModel()
+    }
+}
 
+// MARK: - Configuration
+
+private extension CreateCategoryViewController {
+
+    func configureUI() {
         title = "Новая категория"
         view.backgroundColor = .systemBackground
-
         view.addSubview(textField)
         view.addSubview(doneButton)
+    }
 
-        textField.addTarget(self, action: #selector(textChanged), for: .editingChanged)
-        doneButton.addTarget(self, action: #selector(doneTapped), for: .touchUpInside)
-
+    func configureLayout() {
         NSLayoutConstraint.activate([
             textField.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 24),
             textField.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
@@ -61,33 +70,73 @@ final class CreateCategoryViewController: UIViewController {
             doneButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -16),
             doneButton.heightAnchor.constraint(equalToConstant: 60)
         ])
-
-        bind()
     }
 
-    private func bind() {
+    func configureActions() {
+        textField.addTarget(self, action: #selector(textChanged), for: .editingChanged)
+        doneButton.addTarget(self, action: #selector(doneTapped), for: .touchUpInside)
+    }
+}
+
+// MARK: - Bindings
+
+private extension CreateCategoryViewController {
+
+    func bindViewModel() {
         viewModel.onValidationChanged = { [weak self] isValid in
-            self?.doneButton.isEnabled = isValid
-            self?.doneButton.backgroundColor = isValid ? .black : .systemGray
+            self?.applyValidation(isValid)
         }
 
         viewModel.onCreated = { [weak self] title in
-            self?.onCreated?(title)
-            self?.navigationController?.popViewController(animated: true)
+            self?.handleCreated(title)
         }
 
         viewModel.onError = { [weak self] message in
-            let alert = UIAlertController(title: "Ошибка", message: message, preferredStyle: .alert)
-            alert.addAction(UIAlertAction(title: "Ок", style: .default))
-            self?.present(alert, animated: true)
+            self?.showError(message)
         }
     }
+}
 
-    @objc private func textChanged() {
+// MARK: - UI Updates
+
+private extension CreateCategoryViewController {
+
+    func applyValidation(_ isValid: Bool) {
+        doneButton.isEnabled = isValid
+        doneButton.backgroundColor = isValid ? .black : .systemGray
+    }
+}
+
+// MARK: - Routing
+
+private extension CreateCategoryViewController {
+
+    func handleCreated(_ title: String) {
+        onCreated?(title)
+        navigationController?.popViewController(animated: true)
+    }
+}
+
+// MARK: - Alerts
+
+private extension CreateCategoryViewController {
+
+    func showError(_ message: String) {
+        let alert = UIAlertController(title: "Ошибка", message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "Ок", style: .default))
+        present(alert, animated: true)
+    }
+}
+
+// MARK: - Actions
+
+private extension CreateCategoryViewController {
+
+    @objc func textChanged() {
         viewModel.updateTitle(textField.text ?? "")
     }
 
-    @objc private func doneTapped() {
+    @objc func doneTapped() {
         viewModel.create()
     }
 }

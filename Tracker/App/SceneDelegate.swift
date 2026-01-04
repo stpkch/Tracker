@@ -20,29 +20,10 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     ) {
         guard let windowScene = scene as? UIWindowScene else { return }
 
-        let window = UIWindow(windowScene: windowScene)
+        let window = makeWindow(for: windowScene)
+        let root = makeRootController()
 
-        let root = RootTabBarController(
-            trackerStore: trackerStore,
-            categoryStore: categoryStore,
-            recordStore: recordStore
-        )
-
-        if UserDefaults.standard.bool(forKey: Keys.didShowOnboarding) {
-            window.rootViewController = root
-        } else {
-            let onboarding = OnboardingPageViewController(
-                transitionStyle: .scroll,
-                navigationOrientation: .horizontal
-            )
-
-            onboarding.onFinish = {
-                UserDefaults.standard.set(true, forKey: Keys.didShowOnboarding)
-                window.rootViewController = root
-            }
-
-            window.rootViewController = onboarding
-        }
+        window.rootViewController = makeInitialController(root: root, window: window)
 
         self.window = window
         window.makeKeyAndVisible()
@@ -50,5 +31,54 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     func sceneDidEnterBackground(_ scene: UIScene) {
         CoreDataStack.shared.saveContext()
+    }
+}
+
+// MARK: - Window
+
+private extension SceneDelegate {
+
+    func makeWindow(for windowScene: UIWindowScene) -> UIWindow {
+        UIWindow(windowScene: windowScene)
+    }
+}
+
+// MARK: - Root
+
+private extension SceneDelegate {
+
+    func makeRootController() -> UIViewController {
+        RootTabBarController(
+            trackerStore: trackerStore,
+            categoryStore: categoryStore,
+            recordStore: recordStore
+        )
+    }
+}
+
+// MARK: - Onboarding
+
+private extension SceneDelegate {
+
+    func makeInitialController(root: UIViewController, window: UIWindow) -> UIViewController {
+        shouldShowOnboarding ? makeOnboardingController(root: root, window: window) : root
+    }
+
+    var shouldShowOnboarding: Bool {
+        !UserDefaults.standard.bool(forKey: Keys.didShowOnboarding)
+    }
+
+    func makeOnboardingController(root: UIViewController, window: UIWindow) -> UIViewController {
+        let onboarding = OnboardingPageViewController(
+            transitionStyle: .scroll,
+            navigationOrientation: .horizontal
+        )
+
+        onboarding.onFinish = { [weak window] in
+            UserDefaults.standard.set(true, forKey: Keys.didShowOnboarding)
+            window?.rootViewController = root
+        }
+
+        return onboarding
     }
 }

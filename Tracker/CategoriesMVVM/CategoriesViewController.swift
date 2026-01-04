@@ -5,7 +5,6 @@ final class CategoriesViewController: UIViewController {
     var onPickCategory: ((String) -> Void)?
 
     private let viewModel: CategoriesViewModel
-
     private let tableView = UITableView(frame: .zero, style: .plain)
 
     private let emptyStateLabel: UILabel = {
@@ -39,18 +38,25 @@ final class CategoriesViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        configureUI()
+        configureTableView()
+        configureLayout()
+        configureActions()
+        configureBindings()
+        updateUI()
+    }
+}
 
+// MARK: - Configuration
+
+private extension CategoriesViewController {
+
+    func configureUI() {
         title = "Категория"
         view.backgroundColor = .systemBackground
-
-        setupTable()
-        layoutUI()
-        bindViewModel()
-
-        refreshEmptyState()
     }
 
-    private func setupTable() {
+    func configureTableView() {
         tableView.translatesAutoresizingMaskIntoConstraints = false
         tableView.dataSource = self
         tableView.delegate = self
@@ -58,12 +64,10 @@ final class CategoriesViewController: UIViewController {
         tableView.register(CategoryCell.self, forCellReuseIdentifier: CategoryCell.reuseId)
     }
 
-    private func layoutUI() {
+    func configureLayout() {
         view.addSubview(tableView)
         view.addSubview(emptyStateLabel)
         view.addSubview(addButton)
-
-        addButton.addTarget(self, action: #selector(addCategoryTapped), for: .touchUpInside)
 
         NSLayoutConstraint.activate([
             addButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
@@ -83,40 +87,69 @@ final class CategoriesViewController: UIViewController {
         ])
     }
 
-    private func bindViewModel() {
+    func configureActions() {
+        addButton.addTarget(self, action: #selector(addCategoryTapped), for: .touchUpInside)
+    }
+
+    func configureBindings() {
         viewModel.onUpdate = { [weak self] in
-            guard let self else { return }
-            self.tableView.reloadData()
-            self.refreshEmptyState()
+            self?.updateUI()
         }
 
         viewModel.onPick = { [weak self] title in
-            self?.onPickCategory?(title)
-            self?.navigationController?.popViewController(animated: true)
+            self?.handlePick(title: title)
         }
 
         viewModel.onError = { [weak self] message in
-            let alert = UIAlertController(title: "Ошибка", message: message, preferredStyle: .alert)
-            alert.addAction(UIAlertAction(title: "Ок", style: .default))
-            self?.present(alert, animated: true)
+            self?.presentError(message)
         }
     }
+}
 
-    private func refreshEmptyState() {
+// MARK: - UI Updates
+
+private extension CategoriesViewController {
+
+    func updateUI() {
+        tableView.reloadData()
+        refreshEmptyState()
+    }
+
+    func refreshEmptyState() {
         let isEmpty = viewModel.isEmpty()
         emptyStateLabel.isHidden = !isEmpty
         tableView.isHidden = isEmpty
     }
+}
 
-    @objc private func addCategoryTapped() {
-        let createVM = CreateCategoryViewModel(store: TrackerCategoryStore(context: CoreDataStack.shared.context))
+// MARK: - Actions
+
+private extension CategoriesViewController {
+
+    func handlePick(title: String) {
+        onPickCategory?(title)
+        navigationController?.popViewController(animated: true)
+    }
+
+    func presentError(_ message: String) {
+        let alert = UIAlertController(title: "Ошибка", message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "Ок", style: .default))
+        present(alert, animated: true)
+    }
+
+    @objc func addCategoryTapped() {
+        let createVM = CreateCategoryViewModel(
+            store: TrackerCategoryStore(context: CoreDataStack.shared.context)
+        )
         let vc = CreateCategoryViewController(viewModel: createVM)
         vc.onCreated = { [weak self] _ in
-            self?.refreshEmptyState()
+            self?.updateUI()
         }
         navigationController?.pushViewController(vc, animated: true)
     }
 }
+
+// MARK: - UITableViewDataSource, UITableViewDelegate
 
 extension CategoriesViewController: UITableViewDataSource, UITableViewDelegate {
 

@@ -18,26 +18,36 @@ final class OnboardingContentViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        setupUI()
+        configureViews()
+        addSubviews()
+        setupLayout()
     }
+}
 
-    private func setupUI() {
+// MARK: - Configuration
+
+private extension OnboardingContentViewController {
+
+    func configureViews() {
         bgImageView.image = image
         bgImageView.contentMode = .scaleAspectFill
         bgImageView.clipsToBounds = true
+        bgImageView.translatesAutoresizingMaskIntoConstraints = false
 
         titleLabel.text = text
         titleLabel.textAlignment = .center
         titleLabel.numberOfLines = 0
         titleLabel.font = .systemFont(ofSize: 32, weight: .bold)
         titleLabel.textColor = .black
+        titleLabel.translatesAutoresizingMaskIntoConstraints = false
+    }
 
+    func addSubviews() {
         view.addSubview(bgImageView)
         view.addSubview(titleLabel)
+    }
 
-        bgImageView.translatesAutoresizingMaskIntoConstraints = false
-        titleLabel.translatesAutoresizingMaskIntoConstraints = false
-
+    func setupLayout() {
         NSLayoutConstraint.activate([
             bgImageView.topAnchor.constraint(equalTo: view.topAnchor),
             bgImageView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
