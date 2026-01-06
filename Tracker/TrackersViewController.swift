@@ -53,8 +53,27 @@ final class TrackersViewController: UIViewController {
             updatePlaceholderVisibility()
         }
     }
+    
+    private var currentFilter: TrackersFilter = .all
 
-    private let placeholderView: UIView = {
+    private var baseVisibleCategories: [TrackerCategory] = []
+
+    private let placeholderTitleLabel = UILabel()
+
+    private lazy var filtersButton: UIButton = {
+        let b = UIButton(type: .system)
+        b.translatesAutoresizingMaskIntoConstraints = false
+        b.setTitle(NSLocalizedString("Фильтры", comment: ""), for: .normal)
+        b.setTitleColor(.white, for: .normal)
+        b.titleLabel?.font = .systemFont(ofSize: 17, weight: .semibold)
+        b.backgroundColor = .systemBlue
+        b.layer.cornerRadius = 16
+        b.contentEdgeInsets = UIEdgeInsets(top: 12, left: 20, bottom: 12, right: 20)
+        b.addTarget(self, action: #selector(filtersTapped), for: .touchUpInside)
+        return b
+    }()
+
+    private lazy var placeholderView: UIView = {
         let container = UIView()
         container.translatesAutoresizingMaskIntoConstraints = false
 
@@ -62,14 +81,13 @@ final class TrackersViewController: UIViewController {
         imageView.translatesAutoresizingMaskIntoConstraints = false
         imageView.contentMode = .scaleAspectFit
 
-        let titleLabel = UILabel()
-        titleLabel.translatesAutoresizingMaskIntoConstraints = false
-        titleLabel.text = NSLocalizedString("trackers.placeholder.title", comment: "")
-        titleLabel.font = UIFont.systemFont(ofSize: 17, weight: .semibold)
-        titleLabel.textAlignment = .center
+        placeholderTitleLabel.translatesAutoresizingMaskIntoConstraints = false
+        placeholderTitleLabel.font = UIFont.systemFont(ofSize: 17, weight: .semibold)
+        placeholderTitleLabel.textAlignment = .center
+        placeholderTitleLabel.numberOfLines = 2
 
         container.addSubview(imageView)
-        container.addSubview(titleLabel)
+        container.addSubview(placeholderTitleLabel)
 
         NSLayoutConstraint.activate([
             imageView.topAnchor.constraint(equalTo: container.topAnchor),
@@ -77,13 +95,14 @@ final class TrackersViewController: UIViewController {
             imageView.widthAnchor.constraint(equalToConstant: 80),
             imageView.heightAnchor.constraint(equalToConstant: 80),
 
-            titleLabel.topAnchor.constraint(equalTo: imageView.bottomAnchor, constant: 16),
-            titleLabel.leadingAnchor.constraint(equalTo: container.leadingAnchor),
-            titleLabel.trailingAnchor.constraint(equalTo: container.trailingAnchor),
+            placeholderTitleLabel.topAnchor.constraint(equalTo: imageView.bottomAnchor, constant: 16),
+            placeholderTitleLabel.leadingAnchor.constraint(equalTo: container.leadingAnchor),
+            placeholderTitleLabel.trailingAnchor.constraint(equalTo: container.trailingAnchor),
         ])
 
         return container
     }()
+
 
     init(trackerStore: TrackerStore,
          categoryStore: TrackerCategoryStore,
@@ -105,6 +124,7 @@ final class TrackersViewController: UIViewController {
         setupNavigationBar()
         setupCollectionView()
         setupPlaceholder()
+        setupFiltersButton()
 
         trackerStore.onChange = { [weak self] in
             self?.reloadFromCoreData()
@@ -156,12 +176,25 @@ final class TrackersViewController: UIViewController {
 
     private func setupCollectionView() {
         view.addSubview(collectionView)
+        
+        collectionView.alwaysBounceVertical = true
+        collectionView.contentInset.bottom = 90
+        collectionView.verticalScrollIndicatorInsets.bottom = 90
 
         NSLayoutConstraint.activate([
             collectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+        ])
+    }
+    
+    private func setupFiltersButton() {
+        view.addSubview(filtersButton)
+
+        NSLayoutConstraint.activate([
+            filtersButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            filtersButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -16)
         ])
     }
 
@@ -184,12 +217,36 @@ final class TrackersViewController: UIViewController {
     private func updateIsEmptyState() {
         isEmpty = visibleCategories.isEmpty
     }
+    
+    private func updateFiltersButtonVisibility() {
+        filtersButton.isHidden = baseVisibleCategories.isEmpty
+    }
+
+    private func updatePlaceholderText() {
+        if categories.isEmpty {
+            placeholderTitleLabel.text = NSLocalizedString("trackers.placeholder.title", comment: "")
+            return
+        }
+
+        if baseVisibleCategories.isEmpty || visibleCategories.isEmpty {
+            placeholderTitleLabel.text = NSLocalizedString("Ничего не найдено", comment: "")
+            return
+        }
+
+        placeholderTitleLabel.text = NSLocalizedString("trackers.placeholder.title", comment: "")
+    }
+
+    private func updateFiltersButtonAppearance() {
+        let isActive = currentFilter == .completed || currentFilter == .uncompleted
+        filtersButton.backgroundColor = isActive ? .systemRed : .systemBlue
+    }
+
 
     private func applyFilters() {
         let weekday = Weekday.from(date: selectedDate, calendar: calendar)
         let query = searchText.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
 
-        let filtered: [TrackerCategory] = categories.compactMap { category in
+        let base: [TrackerCategory] = categories.compactMap { category in
             var trackersForDay = category.trackers.filter { $0.schedule.contains(weekday) }
 
             if !query.isEmpty {
@@ -200,7 +257,29 @@ final class TrackersViewController: UIViewController {
             return TrackerCategory(title: category.title, trackers: trackersForDay)
         }
 
-        visibleCategories = filtered
+        baseVisibleCategories = base
+
+        let filteredByStatus: [TrackerCategory]
+        switch currentFilter {
+        case .completed:
+            filteredByStatus = base.compactMap { category in
+                let t = category.trackers.filter { isCompletedOnSelectedDate($0) }
+                return t.isEmpty ? nil : TrackerCategory(title: category.title, trackers: t)
+            }
+        case .uncompleted:
+            filteredByStatus = base.compactMap { category in
+                let t = category.trackers.filter { !isCompletedOnSelectedDate($0) }
+                return t.isEmpty ? nil : TrackerCategory(title: category.title, trackers: t)
+            }
+        case .all, .today:
+            filteredByStatus = base
+        }
+
+        visibleCategories = filteredByStatus
+
+        updateFiltersButtonVisibility()
+        updatePlaceholderText()
+        updateFiltersButtonAppearance()
     }
 
     private func toggleTracker(_ tracker: Tracker, on date: Date) {
@@ -367,5 +446,33 @@ extension TrackersViewController: UICollectionViewDelegate {
 
         present(alert, animated: true)
     }
+    
+    @objc private func filtersTapped() {
+        let vc = FiltersViewController(selectedFilter: currentFilter)
+        vc.onSelect = { [weak self] filter in
+            guard let self else { return }
+            self.applySelectedFilter(filter)
+        }
+
+        let nav = UINavigationController(rootViewController: vc)
+        nav.modalPresentationStyle = .pageSheet
+        present(nav, animated: true)
+    }
+
+    private func applySelectedFilter(_ filter: TrackersFilter) {
+        switch filter {
+        case .today:
+            let today = calendar.startOfDay(for: Date())
+            selectedDate = today
+            datePicker.setDate(today, animated: true)
+            currentFilter = .all
+        case .all:
+            currentFilter = .all
+        case .completed, .uncompleted:
+            currentFilter = filter
+        }
+        applyFilters()
+    }
+
 }
 
