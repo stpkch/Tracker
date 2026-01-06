@@ -3,4 +3,122 @@
    uuid = "69429089-A205-460F-B75B-ECBB45C4419F"
    type = "1"
    version = "2.0">
+   <Breakpoints>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "F04A9D28-D831-4D80-875F-BF9F732C1F5E"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "TrackerTests/TrackerTests.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "4"
+            endingLineNumber = "4"
+            landmarkName = "TrackersSnapshotTests"
+            landmarkType = "3">
+            <Locations>
+               <Location
+                  uuid = "F04A9D28-D831-4D80-875F-BF9F732C1F5E - 4e7d8702ccd6c4c9"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "TrackerTests.TrackersSnapshotTests.__allocating_init(invocation: Swift.Optional&lt;__C.NSInvocation&gt;) -&gt; TrackerTests.TrackersSnapshotTests"
+                  moduleName = "TrackerTests"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/kachusovstepa/Desktop/dev/projects/Tracker/TrackerTests/TrackerTests.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "0"
+                  endingLineNumber = "0">
+               </Location>
+               <Location
+                  uuid = "F04A9D28-D831-4D80-875F-BF9F732C1F5E - fac74d4875f9c7e2"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "TrackerTests.TrackersSnapshotTests.init(invocation: Swift.Optional&lt;__C.NSInvocation&gt;) -&gt; TrackerTests.TrackersSnapshotTests"
+                  moduleName = "TrackerTests"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/kachusovstepa/Desktop/dev/projects/Tracker/TrackerTests/TrackerTests.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "0"
+                  endingLineNumber = "0">
+               </Location>
+               <Location
+                  uuid = "F04A9D28-D831-4D80-875F-BF9F732C1F5E - 11042a97ecd8e00a"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "TrackerTests.TrackersSnapshotTests.__allocating_init(selector: ObjectiveC.Selector) -&gt; TrackerTests.TrackersSnapshotTests"
+                  moduleName = "TrackerTests"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/kachusovstepa/Desktop/dev/projects/Tracker/TrackerTests/TrackerTests.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "0"
+                  endingLineNumber = "0">
+               </Location>
+               <Location
+                  uuid = "F04A9D28-D831-4D80-875F-BF9F732C1F5E - f8fdeff889d6bdc2"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "TrackerTests.TrackersSnapshotTests.init(selector: ObjectiveC.Selector) -&gt; TrackerTests.TrackersSnapshotTests"
+                  moduleName = "TrackerTests"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/kachusovstepa/Desktop/dev/projects/Tracker/TrackerTests/TrackerTests.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "0"
+                  endingLineNumber = "0">
+               </Location>
+               <Location
+                  uuid = "F04A9D28-D831-4D80-875F-BF9F732C1F5E - 6c041e692e2389fb"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "TrackerTests.TrackersSnapshotTests.__allocating_init() -&gt; TrackerTests.TrackersSnapshotTests"
+                  moduleName = "TrackerTests"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/kachusovstepa/Desktop/dev/projects/Tracker/TrackerTests/TrackerTests.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "0"
+                  endingLineNumber = "0">
+               </Location>
+               <Location
+                  uuid = "F04A9D28-D831-4D80-875F-BF9F732C1F5E - 9e1e74b74bbd2e08"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "TrackerTests.TrackersSnapshotTests.init() -&gt; TrackerTests.TrackersSnapshotTests"
+                  moduleName = "TrackerTests"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/kachusovstepa/Desktop/dev/projects/Tracker/TrackerTests/TrackerTests.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "5"
+                  endingLineNumber = "5">
+               </Location>
+               <Location
+                  uuid = "F04A9D28-D831-4D80-875F-BF9F732C1F5E - 9cda9c6a291f76be"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "TrackerTests.TrackersSnapshotTests.__deallocating_deinit"
+                  moduleName = "TrackerTests"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/kachusovstepa/Desktop/dev/projects/Tracker/TrackerTests/TrackerTests.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "0"
+                  endingLineNumber = "0">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+   </Breakpoints>
 </Bucket>
