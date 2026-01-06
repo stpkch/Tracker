@@ -103,7 +103,6 @@ final class TrackersViewController: UIViewController {
         return container
     }()
 
-
     init(trackerStore: TrackerStore,
          categoryStore: TrackerCategoryStore,
          recordStore: TrackerRecordStore) {
@@ -132,6 +131,16 @@ final class TrackersViewController: UIViewController {
 
         reloadFromCoreData()
         updatePlaceholderVisibility()
+    }
+
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        AnalyticsService.shared.report(event: .open, screen: .main, item: nil)
+    }
+
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        AnalyticsService.shared.report(event: .close, screen: .main, item: nil)
     }
 
     private func reloadFromCoreData() {
@@ -184,7 +193,6 @@ final class TrackersViewController: UIViewController {
         navigationController?.navigationBar.scrollEdgeAppearance = appearance
         navigationController?.navigationBar.compactAppearance = appearance
         navigationController?.navigationBar.tintColor = .label
-
     }
 
     private func setupCollectionView() {
@@ -253,7 +261,6 @@ final class TrackersViewController: UIViewController {
         let isActive = currentFilter == .completed || currentFilter == .uncompleted
         filtersButton.backgroundColor = isActive ? .systemRed : .systemBlue
     }
-
 
     private func applyFilters() {
         let weekday = Weekday.from(date: selectedDate, calendar: calendar)
@@ -324,6 +331,7 @@ final class TrackersViewController: UIViewController {
     }
 
     @objc private func addTrackerTapped() {
+        AnalyticsService.shared.report(event: .click, screen: .main, item: .addTrack)
         let newHabitVC = NewHabitViewController(trackerStore: trackerStore)
         newHabitVC.onCreateTracker = { _ in }
         let nav = UINavigationController(rootViewController: newHabitVC)
@@ -387,10 +395,15 @@ extension TrackersViewController: UICollectionViewDelegateFlowLayout {
         let width = availableWidth / 2
         return CGSize(width: width, height: 140)
     }
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        AnalyticsService.shared.report(event: .click, screen: .main, item: .track)
+    }
 }
 
 extension TrackersViewController: TrackerCellDelegate {
     func trackerCellDidTapToggle(_ cell: TrackerCell) {
+        AnalyticsService.shared.report(event: .click, screen: .main, item: .track)
         guard let indexPath = collectionView.indexPath(for: cell) else { return }
 
         let category = visibleCategories[indexPath.section]
@@ -410,10 +423,12 @@ extension TrackersViewController: UICollectionViewDelegate {
             guard let self else { return UIMenu(title: "", children: []) }
 
             let edit = UIAction(title: NSLocalizedString("Редактировать", comment: "")) { [weak self] _ in
+                AnalyticsService.shared.report(event: .click, screen: .main, item: .edit)
                 self?.presentEdit(tracker: tracker)
             }
 
             let delete = UIAction(title: NSLocalizedString("Удалить", comment: ""), attributes: [.destructive]) { [weak self] _ in
+                AnalyticsService.shared.report(event: .click, screen: .main, item: .delete)
                 self?.confirmDelete(tracker: tracker)
             }
 
@@ -461,6 +476,7 @@ extension TrackersViewController: UICollectionViewDelegate {
     }
     
     @objc private func filtersTapped() {
+        AnalyticsService.shared.report(event: .click, screen: .main, item: .filter)
         let vc = FiltersViewController(selectedFilter: currentFilter)
         vc.onSelect = { [weak self] filter in
             guard let self else { return }
@@ -486,6 +502,4 @@ extension TrackersViewController: UICollectionViewDelegate {
         }
         applyFilters()
     }
-
 }
-
