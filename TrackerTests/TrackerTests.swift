@@ -4,7 +4,17 @@ import SnapshotTesting
 
 final class TrackersSnapshotTests: XCTestCase {
 
-    func testTrackersViewController() {
+    func testTrackersViewController_light() {
+        let nav = makeSUT()
+        assertSnapshot(of: nav, as: .image(traits: .init(userInterfaceStyle: .light)))
+    }
+
+    func testTrackersViewController_dark() {
+        let nav = makeSUT()
+        assertSnapshot(of: nav, as: .image(traits: .init(userInterfaceStyle: .dark)))
+    }
+
+    private func makeSUT() -> UINavigationController {
         let context = CoreDataStack.shared.context
 
         let trackerStore = TrackerStore(context: context)
@@ -19,7 +29,6 @@ final class TrackersSnapshotTests: XCTestCase {
 
         let nav = UINavigationController(rootViewController: vc)
         nav.view.frame = CGRect(x: 0, y: 0, width: 393, height: 852)
-
-        assertSnapshot(of: nav, as: .image)
+        return nav
     }
 }
