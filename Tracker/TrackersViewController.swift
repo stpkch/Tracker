@@ -9,6 +9,9 @@ final class TrackersViewController: UIViewController {
     private let recordStore: TrackerRecordStore
 
     private var selectedDate: Date = Calendar.current.startOfDay(for: Date())
+    private var searchText: String = ""
+
+    private let searchController = UISearchController(searchResultsController: nil)
 
     private lazy var datePicker: UIDatePicker = {
         let picker = UIDatePicker()
@@ -118,7 +121,7 @@ final class TrackersViewController: UIViewController {
         let categoryTitle = NSLocalizedString("trackers.category.habits", comment: "")
         categories = trackers.isEmpty ? [] : [TrackerCategory(title: categoryTitle, trackers: trackers)]
 
-        applyFiltersForSelectedDate()
+        applyFilters()
     }
 
     private func mapTracker(_ cd: TrackerCoreData) -> Tracker {
@@ -142,6 +145,13 @@ final class TrackersViewController: UIViewController {
 
         let datePickerItem = UIBarButtonItem(customView: datePicker)
         navigationItem.rightBarButtonItem = datePickerItem
+
+        searchController.obscuresBackgroundDuringPresentation = false
+        searchController.searchBar.placeholder = NSLocalizedString("trackers.search.placeholder", comment: "")
+        searchController.searchResultsUpdater = self
+        navigationItem.searchController = searchController
+        navigationItem.hidesSearchBarWhenScrolling = false
+        definesPresentationContext = true
     }
 
     private func setupCollectionView() {
@@ -175,11 +185,17 @@ final class TrackersViewController: UIViewController {
         isEmpty = visibleCategories.isEmpty
     }
 
-    private func applyFiltersForSelectedDate() {
+    private func applyFilters() {
         let weekday = Weekday.from(date: selectedDate, calendar: calendar)
+        let query = searchText.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
 
         let filtered: [TrackerCategory] = categories.compactMap { category in
-            let trackersForDay = category.trackers.filter { $0.schedule.contains(weekday) }
+            var trackersForDay = category.trackers.filter { $0.schedule.contains(weekday) }
+
+            if !query.isEmpty {
+                trackersForDay = trackersForDay.filter { $0.title.lowercased().contains(query) }
+            }
+
             guard !trackersForDay.isEmpty else { return nil }
             return TrackerCategory(title: category.title, trackers: trackersForDay)
         }
@@ -224,7 +240,14 @@ final class TrackersViewController: UIViewController {
 
     @objc private func datePickerValueChanged(_ sender: UIDatePicker) {
         selectedDate = calendar.startOfDay(for: sender.date)
-        applyFiltersForSelectedDate()
+        applyFilters()
+    }
+}
+
+extension TrackersViewController: UISearchResultsUpdating {
+    func updateSearchResults(for searchController: UISearchController) {
+        searchText = searchController.searchBar.text ?? ""
+        applyFilters()
     }
 }
 

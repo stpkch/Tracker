@@ -49,6 +49,7 @@
 
 "create_category.save_failed" = "Не удалось сохранить категорию: %@";
 
+"trackers.search.placeholder" = "Поиск";
 
 "weekday.monday" = "Понедельник";
 "weekday.tuesday" = "Вторник";

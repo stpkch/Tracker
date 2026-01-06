@@ -91,7 +91,7 @@ final class TrackerCell: UICollectionViewCell {
         titleLabel.text = tracker.title
         contentView.backgroundColor = tracker.color
 
-        let format = NSLocalizedString("days_count", comment: "")
+        _ = NSLocalizedString("days_count", comment: "")
         countLabel.text = Plurals.days(completedCount)
 
 
