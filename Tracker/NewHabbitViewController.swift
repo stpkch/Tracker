@@ -7,6 +7,7 @@ final class NewHabitViewController: UIViewController {
     private let trackerStore: TrackerStore
     private var selectedSchedule: Set<Weekday> = []
     private var selectedCategoryTitle: String?
+    private let trackerToEdit: Tracker?
 
     private let scrollView: UIScrollView = {
         let sv = UIScrollView()
@@ -150,8 +151,9 @@ final class NewHabitViewController: UIViewController {
         static let cornerRadius: CGFloat = 8
     }
 
-    init(trackerStore: TrackerStore) {
+    init(trackerStore: TrackerStore, trackerToEdit: Tracker? = nil) {
         self.trackerStore = trackerStore
+        self.trackerToEdit = trackerToEdit
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -271,6 +273,32 @@ final class NewHabitViewController: UIViewController {
 
         createButton.isEnabled = false
         createButton.backgroundColor = .systemGray
+        
+        if let trackerToEdit {
+            title = NSLocalizedString("Редактирование", comment: "")
+            createButton.setTitle(NSLocalizedString("Сохранить", comment: ""), for: .normal)
+
+            nameTextField.text = trackerToEdit.title
+
+            if let emojiIndex = emojis.firstIndex(of: trackerToEdit.emoji) {
+                selectedEmojiIndexPath = IndexPath(item: emojiIndex, section: 0)
+            }
+
+            let targetHex = trackerToEdit.color.toHexString().lowercased()
+            if let colorIndex = colors.firstIndex(where: { $0.toHexString().lowercased() == targetHex }) {
+                selectedColorIndexPath = IndexPath(item: colorIndex, section: 0)
+            }
+
+            selectedSchedule = trackerToEdit.schedule
+
+            let defaultCategory = NSLocalizedString("trackers.category.habits", comment: "")
+            selectedCategoryTitle = defaultCategory
+            categoryCell.setValue(defaultCategory)
+
+            emojiCollectionView.reloadData()
+            colorCollectionView.reloadData()
+            updateCreateButtonState()
+        }
     }
 
     override func viewDidLayoutSubviews() {
@@ -297,8 +325,10 @@ final class NewHabitViewController: UIViewController {
         let emoji = emojis[emojiIndexPath.item]
         let color = colors[colorIndexPath.item]
 
+        let id = trackerToEdit?.id ?? UUID()
+
         let trackerModel = Tracker(
-            id: UUID(),
+            id: id,
             title: title,
             color: color,
             emoji: emoji,
@@ -306,7 +336,11 @@ final class NewHabitViewController: UIViewController {
         )
 
         do {
-            try trackerStore.addTracker(trackerModel)
+            if trackerToEdit == nil {
+                try trackerStore.addTracker(trackerModel)
+            } else {
+                try trackerStore.updateTracker(trackerModel)
+            }
         } catch {
             assertionFailure("Failed to save tracker: \(error)")
         }

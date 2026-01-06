@@ -308,3 +308,64 @@ extension TrackersViewController: TrackerCellDelegate {
         collectionView.reloadItems(at: [indexPath])
     }
 }
+
+extension TrackersViewController: UICollectionViewDelegate {
+
+    func collectionView(_ collectionView: UICollectionView, contextMenuConfigurationForItemAt indexPath: IndexPath, point: CGPoint) -> UIContextMenuConfiguration? {
+        let tracker = visibleCategories[indexPath.section].trackers[indexPath.item]
+
+        return UIContextMenuConfiguration(identifier: tracker.id as NSUUID, previewProvider: nil) { [weak self] _ in
+            guard let self else { return UIMenu(title: "", children: []) }
+
+            let edit = UIAction(title: NSLocalizedString("Редактировать", comment: "")) { [weak self] _ in
+                self?.presentEdit(tracker: tracker)
+            }
+
+            let delete = UIAction(title: NSLocalizedString("Удалить", comment: ""), attributes: [.destructive]) { [weak self] _ in
+                self?.confirmDelete(tracker: tracker)
+            }
+
+            return UIMenu(title: "", children: [edit, delete])
+        }
+    }
+
+    private func presentEdit(tracker: Tracker) {
+        let vc = NewHabitViewController(trackerStore: trackerStore, trackerToEdit: tracker)
+        let nav = UINavigationController(rootViewController: vc)
+        present(nav, animated: true)
+    }
+
+    private func confirmDelete(tracker: Tracker) {
+        let alert = UIAlertController(
+            title: NSLocalizedString("Удалить трекер?", comment: ""),
+            message: nil,
+            preferredStyle: .actionSheet
+        )
+
+        alert.addAction(UIAlertAction(title: NSLocalizedString("Удалить", comment: ""), style: .destructive) { [weak self] _ in
+            guard let self else { return }
+            do {
+                try self.trackerStore.deleteTracker(with: tracker.id)
+            } catch {
+                let errAlert = UIAlertController(
+                    title: NSLocalizedString("alert.error_title", comment: ""),
+                    message: error.localizedDescription,
+                    preferredStyle: .alert
+                )
+                errAlert.addAction(UIAlertAction(title: NSLocalizedString("common.ok", comment: ""), style: .default))
+                self.present(errAlert, animated: true)
+            }
+        })
+
+        alert.addAction(UIAlertAction(title: NSLocalizedString("Отмена", comment: ""), style: .cancel))
+
+        if let popover = alert.popoverPresentationController,
+           let indexPath = visibleCategories.firstIndex(where: { $0.trackers.contains(where: { $0.id == tracker.id }) }) {
+            popover.sourceView = collectionView
+            popover.sourceRect = collectionView.layoutAttributesForItem(at: IndexPath(item: 0, section: indexPath))?.frame ?? collectionView.bounds
+        }
+
+        present(alert, animated: true)
+    }
+}
+
