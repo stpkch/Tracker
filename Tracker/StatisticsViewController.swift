@@ -5,11 +5,11 @@ final class StatisticsViewController: UIViewController {
         super.viewDidLoad()
 
         view.backgroundColor = .systemBackground
-        title = "Статистика"
+        title = NSLocalizedString("statistics.title", comment: "")
 
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
-        label.text = "Статистика пока пустая"
+        label.text = NSLocalizedString("statistics.empty", comment: "")
         label.textColor = .secondaryLabel
         label.textAlignment = .center
 

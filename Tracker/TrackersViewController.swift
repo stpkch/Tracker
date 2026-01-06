@@ -4,12 +4,9 @@ final class TrackersViewController: UIViewController {
 
     private let calendar = Calendar.current
 
-    // Stores
     private let trackerStore: TrackerStore
     private let categoryStore: TrackerCategoryStore
     private let recordStore: TrackerRecordStore
-
-    // MARK: - UI / Date
 
     private var selectedDate: Date = Calendar.current.startOfDay(for: Date())
 
@@ -38,10 +35,8 @@ final class TrackersViewController: UIViewController {
         return collectionView
     }()
 
-    // MARK: - Data (UI model)
-
     private var categories: [TrackerCategory] = []
-    private var completedTrackers: [TrackerRecord] = [] // пока в памяти
+    private var completedTrackers: [TrackerRecord] = []
 
     private var visibleCategories: [TrackerCategory] = [] {
         didSet {
@@ -56,8 +51,6 @@ final class TrackersViewController: UIViewController {
         }
     }
 
-    // MARK: - Placeholder
-
     private let placeholderView: UIView = {
         let container = UIView()
         container.translatesAutoresizingMaskIntoConstraints = false
@@ -68,7 +61,7 @@ final class TrackersViewController: UIViewController {
 
         let titleLabel = UILabel()
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
-        titleLabel.text = "Что будем отслеживать?"
+        titleLabel.text = NSLocalizedString("trackers.placeholder.title", comment: "")
         titleLabel.font = UIFont.systemFont(ofSize: 17, weight: .semibold)
         titleLabel.textAlignment = .center
 
@@ -89,8 +82,6 @@ final class TrackersViewController: UIViewController {
         return container
     }()
 
-    // MARK: - Init
-
     init(trackerStore: TrackerStore,
          categoryStore: TrackerCategoryStore,
          recordStore: TrackerRecordStore) {
@@ -103,8 +94,6 @@ final class TrackersViewController: UIViewController {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-
-    // MARK: - Lifecycle
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -122,13 +111,12 @@ final class TrackersViewController: UIViewController {
         updatePlaceholderVisibility()
     }
 
-    // MARK: - Core Data -> UI
-
     private func reloadFromCoreData() {
         let trackersCD = trackerStore.trackers()
         let trackers = trackersCD.map(mapTracker)
 
-        categories = trackers.isEmpty ? [] : [TrackerCategory(title: "Привычки", trackers: trackers)]
+        let categoryTitle = NSLocalizedString("trackers.category.habits", comment: "")
+        categories = trackers.isEmpty ? [] : [TrackerCategory(title: categoryTitle, trackers: trackers)]
 
         applyFiltersForSelectedDate()
     }
@@ -138,17 +126,12 @@ final class TrackersViewController: UIViewController {
         let title = cd.name ?? ""
         let emoji = cd.emoji ?? "🙂"
         let color = UIColor(hex: cd.colorHex ?? "#000000") ?? .black
-
-
         let schedule = Set(Weekday.allCases)
-
         return Tracker(id: id, title: title, color: color, emoji: emoji, schedule: schedule)
     }
 
-    // MARK: - Setup
-
     private func setupNavigationBar() {
-        title = "Трекеры"
+        title = NSLocalizedString("trackers.title", comment: "")
 
         let addButton = UIBarButtonItem(
             barButtonSystemItem: .add,
@@ -192,8 +175,6 @@ final class TrackersViewController: UIViewController {
         isEmpty = visibleCategories.isEmpty
     }
 
-    // MARK: - Фильтрация по выбранной дате
-
     private func applyFiltersForSelectedDate() {
         let weekday = Weekday.from(date: selectedDate, calendar: calendar)
 
@@ -205,8 +186,6 @@ final class TrackersViewController: UIViewController {
 
         visibleCategories = filtered
     }
-
-    // MARK: - Работа с отметками
 
     private func toggleTracker(_ tracker: Tracker, on date: Date) {
         let day = calendar.startOfDay(for: date)
@@ -236,13 +215,9 @@ final class TrackersViewController: UIViewController {
         completedTrackers.filter { $0.trackerId == tracker.id }.count
     }
 
-    // MARK: - Actions
-
     @objc private func addTrackerTapped() {
         let newHabitVC = NewHabitViewController(trackerStore: trackerStore)
-
         newHabitVC.onCreateTracker = { _ in }
-
         let nav = UINavigationController(rootViewController: newHabitVC)
         present(nav, animated: true)
     }
@@ -252,8 +227,6 @@ final class TrackersViewController: UIViewController {
         applyFiltersForSelectedDate()
     }
 }
-
-// MARK: - UICollectionViewDataSource
 
 extension TrackersViewController: UICollectionViewDataSource {
 
@@ -289,8 +262,6 @@ extension TrackersViewController: UICollectionViewDataSource {
     }
 }
 
-// MARK: - UICollectionViewDelegateFlowLayout
-
 extension TrackersViewController: UICollectionViewDelegateFlowLayout {
 
     func collectionView(_ collectionView: UICollectionView,
@@ -302,8 +273,6 @@ extension TrackersViewController: UICollectionViewDelegateFlowLayout {
         return CGSize(width: width, height: 140)
     }
 }
-
-// MARK: - TrackerCellDelegate
 
 extension TrackersViewController: TrackerCellDelegate {
     func trackerCellDidTapToggle(_ cell: TrackerCell) {

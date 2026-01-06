@@ -15,7 +15,7 @@ final class ScheduleViewController: UIViewController {
 
     private let doneButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitle("Готово", for: .normal)
+        button.setTitle(NSLocalizedString("schedule.done", comment: ""), for: .normal)
         button.setTitleColor(.white, for: .normal)
         button.backgroundColor = .black
         button.layer.cornerRadius = 16
@@ -26,7 +26,7 @@ final class ScheduleViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        title = "Расписание"
+        title = NSLocalizedString("schedule.title", comment: "")
         view.backgroundColor = .systemBackground
 
         tableView.translatesAutoresizingMaskIntoConstraints = false

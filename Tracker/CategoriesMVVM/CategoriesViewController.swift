@@ -10,7 +10,7 @@ final class CategoriesViewController: UIViewController {
     private let emptyStateLabel: UILabel = {
         let l = UILabel()
         l.translatesAutoresizingMaskIntoConstraints = false
-        l.text = "Привычки и события можно\nобъединить по смыслу"
+        l.text = NSLocalizedString("categories.empty", comment: "")
         l.textAlignment = .center
         l.textColor = .secondaryLabel
         l.numberOfLines = 0
@@ -20,7 +20,7 @@ final class CategoriesViewController: UIViewController {
     private let addButton: UIButton = {
         let b = UIButton(type: .system)
         b.translatesAutoresizingMaskIntoConstraints = false
-        b.setTitle("Добавить категорию", for: .normal)
+        b.setTitle(NSLocalizedString("categories.add", comment: ""), for: .normal)
         b.setTitleColor(.white, for: .normal)
         b.backgroundColor = .black
         b.layer.cornerRadius = 16
@@ -47,12 +47,10 @@ final class CategoriesViewController: UIViewController {
     }
 }
 
-// MARK: - Configuration
-
 private extension CategoriesViewController {
 
     func configureUI() {
-        title = "Категория"
+        title = NSLocalizedString("categories.title", comment: "")
         view.backgroundColor = .systemBackground
     }
 
@@ -106,8 +104,6 @@ private extension CategoriesViewController {
     }
 }
 
-// MARK: - UI Updates
-
 private extension CategoriesViewController {
 
     func updateUI() {
@@ -122,8 +118,6 @@ private extension CategoriesViewController {
     }
 }
 
-// MARK: - Actions
-
 private extension CategoriesViewController {
 
     func handlePick(title: String) {
@@ -132,8 +126,12 @@ private extension CategoriesViewController {
     }
 
     func presentError(_ message: String) {
-        let alert = UIAlertController(title: "Ошибка", message: message, preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: "Ок", style: .default))
+        let alert = UIAlertController(
+            title: NSLocalizedString("alert.error_title", comment: ""),
+            message: message,
+            preferredStyle: .alert
+        )
+        alert.addAction(UIAlertAction(title: NSLocalizedString("common.ok", comment: ""), style: .default))
         present(alert, animated: true)
     }
 
@@ -148,8 +146,6 @@ private extension CategoriesViewController {
         navigationController?.pushViewController(vc, animated: true)
     }
 }
-
-// MARK: - UITableViewDataSource, UITableViewDelegate
 
 extension CategoriesViewController: UITableViewDataSource, UITableViewDelegate {
 

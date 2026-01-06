@@ -1,0 +1,63 @@
+/* 
+  Localizable.strings
+  Tracker
+
+*/
+"days.zero" = "0 дней";
+"days.one" = "%d день";
+"days.few" = "%d дня";
+"days.many" = "%d дней";
+"days.other" = "%d дня";
+
+
+"selected_days_prefix" = "Выбрано:";
+"counter_prefix" = "Счётчик:";
+
+"tab.trackers" = "Трекеры";
+"tab.statistics" = "Статистика";
+
+"trackers.title" = "Трекеры";
+"trackers.placeholder.title" = "Что будем отслеживать?";
+"trackers.category.habits" = "Привычки";
+
+"statistics.title" = "Статистика";
+"statistics.empty" = "Статистика пока пустая";
+
+"new_habit.title" = "Создание привычки";
+"new_habit.name_placeholder" = "Введите название трекера";
+"new_habit.category" = "Категория";
+"new_habit.schedule" = "Расписание";
+"new_habit.cancel" = "Отменить";
+"new_habit.create" = "Создать";
+"new_habit.emoji" = "Emoji";
+"new_habit.color" = "Цвет";
+"new_habit.selected_days_prefix" = "Выбрано дней:";
+
+"schedule.title" = "Расписание";
+"schedule.done" = "Готово";
+
+"categories.title" = "Категория";
+"categories.empty" = "Привычки и события можно\nобъединить по смыслу";
+"categories.add" = "Добавить категорию";
+
+"create_category.title" = "Новая категория";
+"create_category.placeholder" = "Введите название категории";
+"create_category.done" = "Готово";
+
+"alert.error_title" = "Ошибка";
+"common.ok" = "Ок";
+
+"create_category.save_failed" = "Не удалось сохранить категорию: %@";
+
+
+"weekday.monday" = "Понедельник";
+"weekday.tuesday" = "Вторник";
+"weekday.wednesday" = "Среда";
+"weekday.thursday" = "Четверг";
+"weekday.friday" = "Пятница";
+"weekday.saturday" = "Суббота";
+"weekday.sunday" = "Воскресенье";
+
+"onboarding.page1.text" = "Отслеживайте только\nто, что хотите";
+"onboarding.page2.text" = "Даже если это\nне литры воды и йога";
+"onboarding.button" = "Вот это технологии!";

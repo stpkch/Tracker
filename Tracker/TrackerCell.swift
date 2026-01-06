@@ -91,11 +91,12 @@ final class TrackerCell: UICollectionViewCell {
         titleLabel.text = tracker.title
         contentView.backgroundColor = tracker.color
 
-        countLabel.text = "Счётчик: \(completedCount)"
+        let format = NSLocalizedString("days_count", comment: "")
+        countLabel.text = Plurals.days(completedCount)
+
 
         let imageName = isCompletedOnSelectedDate ? "checkmark" : "plus"
         let image = UIImage(systemName: imageName)
         toggleButton.setImage(image, for: .normal)
     }
 }
-
