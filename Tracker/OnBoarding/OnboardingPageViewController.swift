@@ -11,11 +11,11 @@ final class OnboardingPageViewController: UIPageViewController {
         [
             OnboardingContentViewController(
                 image: UIImage(named: "onboardingBlue")!,
-                text: "Отслеживайте только\nто, что хотите"
+                text: NSLocalizedString("onboarding.page1.text", comment: "")
             ),
             OnboardingContentViewController(
                 image: UIImage(named: "onboardingRed")!,
-                text: "Даже если это\nне литры воды и йога"
+                text: NSLocalizedString("onboarding.page2.text", comment: "")
             )
         ]
     }()
@@ -49,7 +49,7 @@ final class OnboardingPageViewController: UIPageViewController {
     }
 
     private func setupButton() {
-        actionButton.setTitle("Вот это технологии!", for: .normal)
+        actionButton.setTitle(NSLocalizedString("onboarding.button", comment: ""), for: .normal)
         actionButton.setTitleColor(.white, for: .normal)
         actionButton.backgroundColor = .black
         actionButton.layer.cornerRadius = 16

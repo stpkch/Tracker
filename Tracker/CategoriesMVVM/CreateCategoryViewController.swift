@@ -9,7 +9,7 @@ final class CreateCategoryViewController: UIViewController {
     private let textField: UITextField = {
         let tf = UITextField()
         tf.translatesAutoresizingMaskIntoConstraints = false
-        tf.placeholder = "Введите название категории"
+        tf.placeholder = NSLocalizedString("create_category.placeholder", comment: "")
         tf.backgroundColor = .systemGray6
         tf.layer.cornerRadius = 16
         tf.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 12, height: 0))
@@ -21,7 +21,7 @@ final class CreateCategoryViewController: UIViewController {
     private let doneButton: UIButton = {
         let b = UIButton(type: .system)
         b.translatesAutoresizingMaskIntoConstraints = false
-        b.setTitle("Готово", for: .normal)
+        b.setTitle(NSLocalizedString("create_category.done", comment: ""), for: .normal)
         b.setTitleColor(.white, for: .normal)
         b.backgroundColor = .systemGray
         b.layer.cornerRadius = 16
@@ -47,12 +47,10 @@ final class CreateCategoryViewController: UIViewController {
     }
 }
 
-// MARK: - Configuration
-
 private extension CreateCategoryViewController {
 
     func configureUI() {
-        title = "Новая категория"
+        title = NSLocalizedString("create_category.title", comment: "")
         view.backgroundColor = .systemBackground
         view.addSubview(textField)
         view.addSubview(doneButton)
@@ -78,8 +76,6 @@ private extension CreateCategoryViewController {
     }
 }
 
-// MARK: - Bindings
-
 private extension CreateCategoryViewController {
 
     func bindViewModel() {
@@ -97,8 +93,6 @@ private extension CreateCategoryViewController {
     }
 }
 
-// MARK: - UI Updates
-
 private extension CreateCategoryViewController {
 
     func applyValidation(_ isValid: Bool) {
@@ -106,8 +100,6 @@ private extension CreateCategoryViewController {
         doneButton.backgroundColor = isValid ? .black : .systemGray
     }
 }
-
-// MARK: - Routing
 
 private extension CreateCategoryViewController {
 
@@ -117,18 +109,18 @@ private extension CreateCategoryViewController {
     }
 }
 
-// MARK: - Alerts
-
 private extension CreateCategoryViewController {
 
     func showError(_ message: String) {
-        let alert = UIAlertController(title: "Ошибка", message: message, preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: "Ок", style: .default))
+        let alert = UIAlertController(
+            title: NSLocalizedString("alert.error_title", comment: ""),
+            message: message,
+            preferredStyle: .alert
+        )
+        alert.addAction(UIAlertAction(title: NSLocalizedString("common.ok", comment: ""), style: .default))
         present(alert, animated: true)
     }
 }
-
-// MARK: - Actions
 
 private extension CreateCategoryViewController {
 

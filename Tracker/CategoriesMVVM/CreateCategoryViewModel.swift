@@ -29,7 +29,8 @@ final class CreateCategoryViewModel {
             try store.addCategory(title: title)
             onCreated?(title.trimmingCharacters(in: .whitespacesAndNewlines))
         } catch {
-            onError?("Не удалось сохранить категорию: \(error)")
+            let format = NSLocalizedString("create_category.save_failed", comment: "")
+            onError?(String(format: format, String(describing: error)))
         }
     }
 }

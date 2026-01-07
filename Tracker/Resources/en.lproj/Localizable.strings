@@ -1,0 +1,62 @@
+"days.zero" = "0 days";
+"days.one" = "%d day";
+"days.few" = "%d days";
+"days.many" = "%d days";
+"days.other" = "%d days";
+
+"selected_days_prefix" = "Selected:";
+"counter_prefix" = "Counter:";
+
+"tab.trackers" = "Trackers";
+"tab.statistics" = "Statistics";
+
+"trackers.title" = "Trackers";
+"trackers.placeholder.title" = "What are we tracking?";
+"trackers.category.habits" = "Habits";
+
+"statistics.title" = "Statistics";
+"statistics.empty" = "Statistics is empty yet";
+
+"new_habit.title" = "Create a habit";
+"new_habit.name_placeholder" = "Enter tracker name";
+"new_habit.category" = "Category";
+"new_habit.schedule" = "Schedule";
+"new_habit.cancel" = "Cancel";
+"new_habit.create" = "Create";
+"new_habit.emoji" = "Emoji";
+"new_habit.color" = "Color";
+"new_habit.selected_days_prefix" = "Selected days:";
+
+"schedule.title" = "Schedule";
+"schedule.done" = "Done";
+
+"categories.title" = "Category";
+"categories.empty" = "Habits and events can be\ncombined by meaning";
+"categories.add" = "Add category";
+
+"create_category.title" = "New category";
+"create_category.placeholder" = "Enter category name";
+"create_category.done" = "Done";
+
+"alert.error_title" = "Error";
+"common.ok" = "OK";
+
+"create_category.save_failed" = "Failed to save category: %@";
+
+"trackers.search.placeholder" = "Search";
+
+"weekday.monday" = "Monday";
+"weekday.tuesday" = "Tuesday";
+"weekday.wednesday" = "Wednesday";
+"weekday.thursday" = "Thursday";
+"weekday.friday" = "Friday";
+"weekday.saturday" = "Saturday";
+"weekday.sunday" = "Sunday";
+
+"onboarding.page1.text" = "Track only\nwhat you want";
+"onboarding.page2.text" = "Even if it's not\nwater and yoga";
+"onboarding.button" = "Wow, technology!";
+
+"filters.title" = "Filters";
+"filters.button" = "Filters";
+"trackers.nothing_found" = "Nothing found";

@@ -45,9 +45,9 @@ final class SettingsCell: UIControl {
     }
 
     required init?(coder: NSCoder) { fatalError() }
-
-    // MARK: - Public
-
+    
+// MARK: - Public
+    
     func setValue(_ text: String?) {
         let trimmed = (text ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
         valueLabel.text = trimmed.isEmpty ? nil : trimmed
