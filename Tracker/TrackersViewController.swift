@@ -63,7 +63,7 @@ final class TrackersViewController: UIViewController {
     private lazy var filtersButton: UIButton = {
         let b = UIButton(type: .system)
         b.translatesAutoresizingMaskIntoConstraints = false
-        b.setTitle(NSLocalizedString("Фильтры", comment: ""), for: .normal)
+        b.setTitle(NSLocalizedString("filters.button", comment: ""), for: .normal)
         b.setTitleColor(.white, for: .normal)
         b.titleLabel?.font = .systemFont(ofSize: 17, weight: .semibold)
         b.backgroundColor = .systemBlue
@@ -118,6 +118,10 @@ final class TrackersViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        collectionView.keyboardDismissMode = .onDrag
+        extendedLayoutIncludesOpaqueBars = true
+
 
         view.backgroundColor = .systemBackground
         setupNavigationBar()
@@ -196,11 +200,14 @@ final class TrackersViewController: UIViewController {
         searchController.searchBar.placeholder = NSLocalizedString("trackers.search.placeholder", comment: "")
         searchController.searchResultsUpdater = self
         navigationItem.searchController = searchController
+        searchController.searchBar.delegate = self
         navigationItem.hidesSearchBarWhenScrolling = false
         definesPresentationContext = true
         navigationController?.navigationBar.prefersLargeTitles = true
 
         collectionView.backgroundColor = .systemBackground
+        
+        navigationItem.largeTitleDisplayMode = .never
     }
 
     private func setupCollectionView() {
@@ -258,7 +265,7 @@ final class TrackersViewController: UIViewController {
         }
 
         if baseVisibleCategories.isEmpty || visibleCategories.isEmpty {
-            placeholderTitleLabel.text = NSLocalizedString("Ничего не найдено", comment: "")
+            placeholderTitleLabel.text = NSLocalizedString("trackers.nothing_found", comment: "")
             return
         }
 
@@ -506,5 +513,17 @@ extension TrackersViewController: UICollectionViewDelegate {
             currentFilter = filter
         }
         applyFilters()
+    }
+}
+
+extension TrackersViewController: UISearchBarDelegate {
+    func searchBarTextDidBeginEditing(_ searchBar: UISearchBar) {
+        view.layoutIfNeeded()
+        collectionView.performBatchUpdates(nil)
+    }
+
+    func searchBarTextDidEndEditing(_ searchBar: UISearchBar) {
+        view.layoutIfNeeded()
+        collectionView.performBatchUpdates(nil)
     }
 }

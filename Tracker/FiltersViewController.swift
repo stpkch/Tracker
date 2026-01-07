@@ -48,7 +48,7 @@ final class FiltersViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        title = NSLocalizedString("Фильтры", comment: "")
+        title = NSLocalizedString("filters.title", comment: "")
         view.backgroundColor = .systemBackground
 
         tableView.dataSource = self

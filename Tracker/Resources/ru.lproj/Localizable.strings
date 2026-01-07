@@ -62,3 +62,7 @@
 "onboarding.page1.text" = "Отслеживайте только\nто, что хотите";
 "onboarding.page2.text" = "Даже если это\nне литры воды и йога";
 "onboarding.button" = "Вот это технологии!";
+
+"filters.title" = "Фильтры";
+"filters.button" = "Фильтры";
+"trackers.nothing_found" = "Ничего не найдено";

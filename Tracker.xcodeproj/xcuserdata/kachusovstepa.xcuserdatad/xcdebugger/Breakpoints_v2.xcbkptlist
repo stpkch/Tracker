@@ -14,8 +14,8 @@
             filePath = "Tracker/TrackersViewController.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "203"
-            endingLineNumber = "203"
+            startingLineNumber = "208"
+            endingLineNumber = "208"
             landmarkName = "setupNavigationBar()"
             landmarkType = "7">
          </BreakpointContent>
