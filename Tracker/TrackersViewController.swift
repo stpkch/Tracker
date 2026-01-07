@@ -128,8 +128,16 @@ final class TrackersViewController: UIViewController {
         trackerStore.onChange = { [weak self] in
             self?.reloadFromCoreData()
         }
+        
+        recordStore.onChange = { [weak self] in
+            self?.reloadRecordsFromCoreData()
+            self?.applyFilters()
+        }
+
 
         reloadFromCoreData()
+        reloadRecordsFromCoreData()
+        applyFilters()
         updatePlaceholderVisibility()
     }
 
@@ -149,8 +157,17 @@ final class TrackersViewController: UIViewController {
 
         let categoryTitle = NSLocalizedString("trackers.category.habits", comment: "")
         categories = trackers.isEmpty ? [] : [TrackerCategory(title: categoryTitle, trackers: trackers)]
-
+        
+        reloadRecordsFromCoreData()
         applyFilters()
+    }
+    
+    private func reloadRecordsFromCoreData() {
+        let recordsCD = recordStore.records()
+        completedTrackers = recordsCD.compactMap { cd in
+            guard let trackerId = cd.tracker?.id, let date = cd.date else { return nil }
+            return TrackerRecord(trackerId: trackerId, date: calendar.startOfDay(for: date))
+        }
     }
 
     private func mapTracker(_ cd: TrackerCoreData) -> Tracker {
@@ -183,16 +200,7 @@ final class TrackersViewController: UIViewController {
         definesPresentationContext = true
         navigationController?.navigationBar.prefersLargeTitles = true
 
-        let appearance = UINavigationBarAppearance()
-        appearance.configureWithOpaqueBackground()
-        appearance.backgroundColor = .systemBackground
-        appearance.titleTextAttributes = [.foregroundColor: UIColor.label]
-        appearance.largeTitleTextAttributes = [.foregroundColor: UIColor.label]
-
-        navigationController?.navigationBar.standardAppearance = appearance
-        navigationController?.navigationBar.scrollEdgeAppearance = appearance
-        navigationController?.navigationBar.compactAppearance = appearance
-        navigationController?.navigationBar.tintColor = .label
+        collectionView.backgroundColor = .systemBackground
     }
 
     private func setupCollectionView() {
@@ -308,26 +316,23 @@ final class TrackersViewController: UIViewController {
 
         guard day <= today else { return }
 
-        if let index = completedTrackers.firstIndex(where: { record in
-            record.trackerId == tracker.id &&
-            calendar.isDate(record.date, inSameDayAs: day)
-        }) {
-            completedTrackers.remove(at: index)
-        } else {
-            let record = TrackerRecord(trackerId: tracker.id, date: day)
-            completedTrackers.append(record)
+        do {
+            if recordStore.isCompleted(trackerId: tracker.id, on: day, calendar: calendar) {
+                try recordStore.deleteRecord(trackerId: tracker.id, date: day, calendar: calendar)
+            } else {
+                try recordStore.addRecord(trackerId: tracker.id, date: day, calendar: calendar)
+            }
+        } catch {
+            assertionFailure("Failed to toggle record: \(error)")
         }
     }
 
     private func isCompletedOnSelectedDate(_ tracker: Tracker) -> Bool {
-        completedTrackers.contains { record in
-            record.trackerId == tracker.id &&
-            calendar.isDate(record.date, inSameDayAs: selectedDate)
-        }
+        recordStore.isCompleted(trackerId: tracker.id, on: selectedDate, calendar: calendar)
     }
 
     private func completedCount(for tracker: Tracker) -> Int {
-        completedTrackers.filter { $0.trackerId == tracker.id }.count
+        recordStore.completedCount(trackerId: tracker.id)
     }
 
     @objc private func addTrackerTapped() {

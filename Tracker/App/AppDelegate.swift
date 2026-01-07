@@ -1,5 +1,5 @@
 import UIKit
-import AppMetricaIdentifiers
+import AppMetricaCore
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {

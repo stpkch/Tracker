@@ -1,5 +1,5 @@
 import Foundation
-import AppMetricaIdentifiers
+import AppMetricaCore
 
 final class AnalyticsService: AnalyticsReporting {
 
