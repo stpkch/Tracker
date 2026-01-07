@@ -53,9 +53,8 @@ final class TrackersViewController: UIViewController {
             updatePlaceholderVisibility()
         }
     }
-    
-    private var currentFilter: TrackersFilter = .all
 
+    private var currentFilter: TrackersFilter = .all
     private var baseVisibleCategories: [TrackerCategory] = []
 
     private let placeholderTitleLabel = UILabel()
@@ -118,10 +117,9 @@ final class TrackersViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+
         collectionView.keyboardDismissMode = .onDrag
         extendedLayoutIncludesOpaqueBars = true
-
 
         view.backgroundColor = .systemBackground
         setupNavigationBar()
@@ -132,12 +130,11 @@ final class TrackersViewController: UIViewController {
         trackerStore.onChange = { [weak self] in
             self?.reloadFromCoreData()
         }
-        
+
         recordStore.onChange = { [weak self] in
             self?.reloadRecordsFromCoreData()
             self?.applyFilters()
         }
-
 
         reloadFromCoreData()
         reloadRecordsFromCoreData()
@@ -161,11 +158,11 @@ final class TrackersViewController: UIViewController {
 
         let categoryTitle = NSLocalizedString("trackers.category.habits", comment: "")
         categories = trackers.isEmpty ? [] : [TrackerCategory(title: categoryTitle, trackers: trackers)]
-        
+
         reloadRecordsFromCoreData()
         applyFilters()
     }
-    
+
     private func reloadRecordsFromCoreData() {
         let recordsCD = recordStore.records()
         completedTrackers = recordsCD.compactMap { cd in
@@ -206,13 +203,12 @@ final class TrackersViewController: UIViewController {
         navigationController?.navigationBar.prefersLargeTitles = true
 
         collectionView.backgroundColor = .systemBackground
-        
         navigationItem.largeTitleDisplayMode = .never
     }
 
     private func setupCollectionView() {
         view.addSubview(collectionView)
-        
+
         collectionView.alwaysBounceVertical = true
         collectionView.contentInset.bottom = 90
         collectionView.verticalScrollIndicatorInsets.bottom = 90
@@ -224,7 +220,7 @@ final class TrackersViewController: UIViewController {
             collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         ])
     }
-    
+
     private func setupFiltersButton() {
         view.addSubview(filtersButton)
 
@@ -253,7 +249,7 @@ final class TrackersViewController: UIViewController {
     private func updateIsEmptyState() {
         isEmpty = visibleCategories.isEmpty
     }
-    
+
     private func updateFiltersButtonVisibility() {
         filtersButton.isHidden = baseVisibleCategories.isEmpty
     }
@@ -354,6 +350,35 @@ final class TrackersViewController: UIViewController {
         selectedDate = calendar.startOfDay(for: sender.date)
         applyFilters()
     }
+
+    @objc private func filtersTapped() {
+        AnalyticsService.shared.report(event: .click, screen: .main, item: .filter)
+
+        let vc = FiltersViewController(selectedFilter: currentFilter)
+        vc.onSelect = { [weak self] filter in
+            guard let self else { return }
+            self.applySelectedFilter(filter)
+        }
+
+        let nav = UINavigationController(rootViewController: vc)
+        nav.modalPresentationStyle = .pageSheet
+        present(nav, animated: true)
+    }
+
+    private func applySelectedFilter(_ filter: TrackersFilter) {
+        switch filter {
+        case .today:
+            let today = calendar.startOfDay(for: Date())
+            selectedDate = today
+            datePicker.setDate(today, animated: true)
+            currentFilter = .all
+        case .all:
+            currentFilter = .all
+        case .completed, .uncompleted:
+            currentFilter = filter
+        }
+        applyFilters()
+    }
 }
 
 extension TrackersViewController: UISearchResultsUpdating {
@@ -407,15 +432,12 @@ extension TrackersViewController: UICollectionViewDelegateFlowLayout {
         let width = availableWidth / 2
         return CGSize(width: width, height: 140)
     }
-    
-    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        AnalyticsService.shared.report(event: .click, screen: .main, item: .track)
-    }
 }
 
 extension TrackersViewController: TrackerCellDelegate {
     func trackerCellDidTapToggle(_ cell: TrackerCell) {
         AnalyticsService.shared.report(event: .click, screen: .main, item: .track)
+
         guard let indexPath = collectionView.indexPath(for: cell) else { return }
 
         let category = visibleCategories[indexPath.section]
@@ -431,9 +453,7 @@ extension TrackersViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, contextMenuConfigurationForItemAt indexPath: IndexPath, point: CGPoint) -> UIContextMenuConfiguration? {
         let tracker = visibleCategories[indexPath.section].trackers[indexPath.item]
 
-        return UIContextMenuConfiguration(identifier: tracker.id as NSUUID, previewProvider: nil) { [weak self] _ in
-            guard let self else { return UIMenu(title: "", children: []) }
-
+        return UIContextMenuConfiguration(identifier: tracker.id as NSUUID, previewProvider: nil) { _ in
             let edit = UIAction(title: NSLocalizedString("Редактировать", comment: "")) { [weak self] _ in
                 AnalyticsService.shared.report(event: .click, screen: .main, item: .edit)
                 self?.presentEdit(tracker: tracker)
@@ -479,40 +499,12 @@ extension TrackersViewController: UICollectionViewDelegate {
         alert.addAction(UIAlertAction(title: NSLocalizedString("Отмена", comment: ""), style: .cancel))
 
         if let popover = alert.popoverPresentationController,
-           let indexPath = visibleCategories.firstIndex(where: { $0.trackers.contains(where: { $0.id == tracker.id }) }) {
+           let section = visibleCategories.firstIndex(where: { $0.trackers.contains(where: { $0.id == tracker.id }) }) {
             popover.sourceView = collectionView
-            popover.sourceRect = collectionView.layoutAttributesForItem(at: IndexPath(item: 0, section: indexPath))?.frame ?? collectionView.bounds
+            popover.sourceRect = collectionView.layoutAttributesForItem(at: IndexPath(item: 0, section: section))?.frame ?? collectionView.bounds
         }
 
         present(alert, animated: true)
-    }
-    
-    @objc private func filtersTapped() {
-        AnalyticsService.shared.report(event: .click, screen: .main, item: .filter)
-        let vc = FiltersViewController(selectedFilter: currentFilter)
-        vc.onSelect = { [weak self] filter in
-            guard let self else { return }
-            self.applySelectedFilter(filter)
-        }
-
-        let nav = UINavigationController(rootViewController: vc)
-        nav.modalPresentationStyle = .pageSheet
-        present(nav, animated: true)
-    }
-
-    private func applySelectedFilter(_ filter: TrackersFilter) {
-        switch filter {
-        case .today:
-            let today = calendar.startOfDay(for: Date())
-            selectedDate = today
-            datePicker.setDate(today, animated: true)
-            currentFilter = .all
-        case .all:
-            currentFilter = .all
-        case .completed, .uncompleted:
-            currentFilter = filter
-        }
-        applyFilters()
     }
 }
 
